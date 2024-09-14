@@ -5,6 +5,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html/v2"
+	"github.com/joshuakinkade/go-site/handlers"
+	"github.com/joshuakinkade/go-site/services"
 )
 
 func main() {
@@ -16,10 +18,10 @@ func main() {
 
 	app.Static("/css", "./public/css")
 
+	pageHandler := handlers.NewPagesHandler(services.NewPostService())
+
 	// Configure routes
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{"Message": "Hello, World!"}, "layouts/base")
-	})
+	app.Get("/", pageHandler.ShowHome)
 	app.Get("/posts", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"message": "Posts"})
 	})

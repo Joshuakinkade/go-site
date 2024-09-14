@@ -1,5 +1,12 @@
 # README
 
+## Project Structure
+
+`handlers` - process requests and return responses
+`models` - define the data models
+`services` - provide business logic
+`db` - database access
+
 ## Routes
 
 Using [fiber](https://docs.gofiber.io/) to handle routing. Go's builtin routing is too limited and I don't want to take time to build my own right now.

@@ -1,3 +1,16 @@
-<header class="mb-4 mt-8">
-    <h1 class="text-5xl underline">{{.Message}}</h1>
-</header>
+<section class="flex flex-col mt-8">
+    <h2 class="text-2xl underline mb-4">The Word of the Lord</h2>
+    <blockquote class="w-1/2">
+        <p class="text-xl">For the word of God is living and active, sharper than any two-edged sword, piercing to the division of soul and of spirit, of joints and of marrow, and discerning the thoughts and intentions of the heart.</p>
+        <footer class="text-lg">Hebrews 4:12</footer>
+    </blockquote>
+</section>
+<section class="mt-8 flex flex-col">
+    <h2 class="text-2xl underline mb-4">Recent Posts</h2>
+    <ul>
+        {{range .RecentPosts}}
+        <li>
+            <h3 class="text-xl"><a href="/posts/{{.Slug}}">{{.Title}}</a></h3>
+        {{end}}
+    </ul>
+</section>
