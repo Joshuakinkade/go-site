@@ -3,8 +3,8 @@ import requests
 def createPost():
     # Define Post
     post = {
-        'title': 'My First Post',
-        'body': 'Hello World!'
+        'title': 'Another Post',
+        'body': 'Here we go again!'
     }
 
     # Send Request

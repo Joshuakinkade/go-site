@@ -32,9 +32,9 @@ func (h PagesHandler) ShowPost(ctx *fiber.Ctx) error {
 	slug := ctx.Params("slug")
 	// post, err := h.posts.GetPostBySlug(slug)
 	post := models.Post{
-		Title:   "Sample Post",
-		Slug:    slug,
-		Content: "This is a sample post.",
+		Title: "Sample Post",
+		Slug:  slug,
+		Body:  "This is a sample post.",
 	}
 
 	return ctx.Render("post", fiber.Map{

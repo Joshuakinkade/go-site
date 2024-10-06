@@ -18,7 +18,7 @@ func (m mockRepository) ListPosts(offset, limit int) ([]models.Post, error) {
 		return []models.Post{{
 			Title:       "Hello, World!",
 			Slug:        "hello-world",
-			Content:     "This is a test post. It's not very interesting, but it's a start.",
+			Body:        "This is a test post. It's not very interesting, but it's a start.",
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 			PublishedAt: nil,
@@ -87,9 +87,9 @@ var _ = Describe("Posts", func() {
 	Describe("CreatePost", func() {
 		It("Should create a post", func() {
 			post, err := posts.CreatePost(models.Post{
-				Title:   "Hello, World!",
-				Slug:    "hello-world",
-				Content: "This is a test post. It's not very interesting, but it's a start.",
+				Title: "Hello, World!",
+				Slug:  "hello-world",
+				Body:  "This is a test post. It's not very interesting, but it's a start.",
 			})
 			Expect(err).To(BeNil())
 			Expect(post.Title).To(Equal("Hello, World!"))
@@ -97,8 +97,8 @@ var _ = Describe("Posts", func() {
 
 		It("Should set defaults for missing data", func() {
 			post, err := posts.CreatePost(models.Post{
-				Title:   "Hello, World!",
-				Content: "This is a test post. It's not very interesting, but it's a start.",
+				Title: "Hello, World!",
+				Body:  "This is a test post. It's not very interesting, but it's a start.",
 			})
 			Expect(err).To(BeNil())
 			Expect(post.Slug).To(Equal("hello-world"))

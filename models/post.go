@@ -10,7 +10,7 @@ type Post struct {
 	ID          uuid.UUID  `json:"id"`
 	Title       string     `json:"title"`
 	Slug        string     `json:"slug"`
-	Content     string     `json:"content"`
+	Body        string     `json:"content"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 	PublishedAt *time.Time `json:"published_at"`
