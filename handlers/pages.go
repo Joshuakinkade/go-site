@@ -16,24 +16,9 @@ func NewPagesHandler(posts services.PostService) PagesHandler {
 
 // ShowHome renders the home page
 func (h PagesHandler) ShowHome(ctx *fiber.Ctx) error {
-	// posts, err := h.posts.ListPosts(0, 3)
-	// if err != nil {
-	// 	return err
-	// }
-
-	posts := []models.Post{{
-		Title:   "Hello, World!",
-		Slug:    "hello-world",
-		Content: "This is the first post on the site.",
-	}, {
-		Title:   "Second Post",
-		Slug:    "second-post",
-		Content: "This is the second post on the site.",
-	}, {
-		Title:   "Third Post",
-		Slug:    "third-post",
-		Content: "This is the third post on the site.",
-	},
+	posts, err := h.posts.ListPosts(0, 3)
+	if err != nil {
+		return err
 	}
 
 	return ctx.Render("index", fiber.Map{

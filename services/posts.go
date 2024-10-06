@@ -1,28 +1,36 @@
 package services
 
-import "github.com/joshuakinkade/go-site/models"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/joshuakinkade/go-site/db"
+	"github.com/joshuakinkade/go-site/lib/text"
+	"github.com/joshuakinkade/go-site/models"
+)
 
 // Depenenencies:
 // posts repository
 
+// PostsService provides methods for working with posts.
 type PostService struct {
+	posts db.IPostsRepository
 }
 
-func NewPostService() PostService {
-	return PostService{}
-}
-
-func (p PostService) ListPosts(offset, limit int) ([]models.Post, error) {
-	posts := []models.Post{
-		{
-			Title:   "Hello, World!",
-			Slug:    "hello-world",
-			Content: "This is a test post. It's not very interesting, but it's a start.",
-		},
+// NewPostService returns an initialized PostService.
+func NewPostService(posts db.IPostsRepository) PostService {
+	return PostService{
+		posts: posts,
 	}
-	return posts, nil
 }
 
+// ListPosts returns a list of posts in reverse chronological order.
+func (p PostService) ListPosts(offset, limit int) ([]models.Post, error) {
+	posts, err := p.posts.ListPosts(offset, limit)
+	return posts, err
+}
+
+// GetPostBySlug returns a post by its slug.
 func (p PostService) GetPostBySlug(slug string) (models.Post, error) {
 	if slug == "hello-world" {
 		return models.Post{
@@ -35,6 +43,22 @@ func (p PostService) GetPostBySlug(slug string) (models.Post, error) {
 	}
 }
 
-func (posts PostService) CreatePost(post models.Post) (models.Post, error) {
-	return models.Post{}, nil
+// CreatePost saves a post and sets sensible defaults for missing data.
+func (p PostService) CreatePost(post models.Post) (models.Post, error) {
+	post.ID, _ = uuid.NewV6()
+	if post.Slug == "" {
+		post.Slug = text.Slugify(post.Title)
+	}
+	if post.CreatedAt.IsZero() {
+		post.CreatedAt = time.Now()
+	}
+
+	post, err := p.posts.CreatePost(post)
+	return post, err
+}
+
+// UpdatePost updates an existing post.
+func (p PostService) UpdatePost(post models.Post) (models.Post, error) {
+	post, err := p.posts.UpdatePost(post)
+	return post, err
 }
