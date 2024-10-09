@@ -1,6 +1,21 @@
 import requests
+import sys
 
-def createPost():
+def main():
+    action = sys.argv[1]
+
+    if action == 'list-posts':
+        list_posts()
+    elif action == 'create-post':
+        create_post()
+    else:
+        print("Action not available")
+
+def list_posts():
+    r = requests.get('http://localhost:8080/api/v1/posts')
+    print(r.text)
+
+def create_post():
     # Define Post
     post = {
         'title': 'Another Post',
@@ -14,4 +29,4 @@ def createPost():
     print(r.text)
 
 if __name__ == '__main__':
-    createPost()
+    main()

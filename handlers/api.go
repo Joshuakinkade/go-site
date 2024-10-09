@@ -17,12 +17,24 @@ func NewAPIHandler(posts services.PostService) APIHandler {
 	return APIHandler{posts: posts}
 }
 
+// ListPosts returns a list of posts
+func (h APIHandler) ListPosts(ctx *fiber.Ctx) error {
+	posts, err := h.posts.ListPosts(0, 10)
+	if err != nil {
+		return err
+	}
+
+	ctx.JSON(posts)
+	return nil
+}
+
 // CreatePost adds a new post to the blog.
 func (h APIHandler) CreatePost(ctx *fiber.Ctx) error {
 	var np models.Post
 	err := ctx.BodyParser(&np)
-	if err != nil {
-		return errors.New("could not read body")
+	if errors.Is(fiber.ErrUnprocessableEntity, err) {
+		ctx.SendStatus(fiber.StatusUnprocessableEntity)
+		return nil
 	}
 
 	np, err = h.posts.CreatePost(np)

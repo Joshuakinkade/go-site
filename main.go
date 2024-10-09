@@ -45,9 +45,8 @@ func main() {
 		return c.JSON(fiber.Map{"message": c.Params("slug")})
 	})
 
-	app.Post("/api/v1/posts", func(c *fiber.Ctx) error {
-		return apiHandler.CreatePost(c)
-	})
+	app.Get("/api/v1/posts", apiHandler.ListPosts)
+	app.Post("/api/v1/posts", apiHandler.CreatePost)
 
 	log.Panic(app.Listen(":8080"))
 }
