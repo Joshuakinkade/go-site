@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -27,22 +26,14 @@ func NewPostService(posts db.IPostsRepository) PostService {
 
 // ListPosts returns a list of posts in reverse chronological order.
 func (p PostService) ListPosts(offset, limit int) ([]models.Post, error) {
-	fmt.Println(offset, limit)
 	posts, err := p.posts.ListPosts(offset, limit)
 	return posts, err
 }
 
 // GetPostBySlug returns a post by its slug.
 func (p PostService) GetPostBySlug(slug string) (models.Post, error) {
-	if slug == "hello-world" {
-		return models.Post{
-			Title: "Hello, World!",
-			Slug:  "hello-world",
-			Body:  "This is a test post. It's not very interesting, but it's a start.",
-		}, nil
-	} else {
-		return models.Post{}, nil
-	}
+	post, err := p.posts.GetPostBySlug(slug)
+	return post, err
 }
 
 // CreatePost saves a post and sets sensible defaults for missing data.

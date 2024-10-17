@@ -1,42 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>joshuakinkade.me</title>
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="font-serif bg-zinc-50 text-zinc-900">
-    <div class="container mx-auto flex min-h-screen">
-        <header class="pr-4 py-4 mr-4 border-r-2">
-            <div>
-                <div class="w-full aspect-square rounded-full bg-zinc-500"></div>
-            </div>
-            <h1 class="text-2xl mb-1 underline">Josh Kinkade</h1>
-            <nav>
-                <ul>
-                    <li><a href="/" class="underline">Home</a></li>
-                    <li><a href="/posts" class="underline">Posts</a></li>
-                    <li><a href="/about-me" class="underline">About Me</a></li>
-                </ul>
-            </nav>
-            <nav class="border-t-2 mt-2 pt-2">
-                <ul class="flex justify-around">
-                    <li>
-                        <a href="#github">GH</a>
-                    </li>
-                    <li>
-                        <a href="#linkedin">LI</a>
-                    </li>
-                    <li>
-                        <a href="#instagram">IG</a>
-                    </li>
-                </ul>
-            </nav>
-        </header>
-        <main class="flex-1">
-            {{embed}}
-        </main>
-    </div>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>joshuakinkade.me</title>
+        <link rel="stylesheet" href="/css/style.css" />
+    </head>
+    <body class="font-serif bg-zinc-50 text-zinc-900">
+        <div class="container mx-auto flex min-h-screen">
+            <header class="pr-4 py-4 mr-4 border-r-2">
+                <div>
+                    <div
+                        class="w-full aspect-square rounded-full bg-zinc-500"
+                    ></div>
+                </div>
+                <h1 class="text-2xl mb-1 underline">Josh Kinkade</h1>
+                <nav>
+                    <ul>
+                        <li><a href="/" class="underline">Home</a></li>
+                        <li><a href="/posts" class="underline">Posts</a></li>
+                        <li>
+                            <a href="/about-me" class="underline">About Me</a>
+                        </li>
+                    </ul>
+                </nav>
+                <nav class="border-t-2 mt-2 pt-2">
+                    <ul class="flex justify-around">
+                        <li>
+                            <a href="#github">GH</a>
+                        </li>
+                        <li>
+                            <a href="#linkedin">LI</a>
+                        </li>
+                        <li>
+                            <a href="#instagram">IG</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+            <main class="flex-1">{{embed}}</main>
+        </div>
+    </body>
 </html>

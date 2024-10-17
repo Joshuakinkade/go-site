@@ -1,5 +1,14 @@
 # README
 
+## Todo
+### Photos
+- [ ] find a good go image manipulation library
+- [ ] implement image optimization
+- [ ] set up localstack s3 container
+
+### Posts
+- [ ] render post body
+
 ## Project Structure
 
 `handlers` - process requests and return responses

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"html/template"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,11 +12,20 @@ import (
 	"github.com/joshuakinkade/go-site/db"
 	"github.com/joshuakinkade/go-site/handlers"
 	"github.com/joshuakinkade/go-site/services"
+	"github.com/yuin/goldmark"
 )
 
 func main() {
 	// Configure the app
 	engine := html.New("./templates", ".html")
+	engine.AddFunc("unescape", func(s string) template.HTML {
+		return template.HTML(s)
+	})
+	engine.AddFunc("RenderMarkdown", func(s string) string {
+		var buf bytes.Buffer
+		goldmark.Convert([]byte(s), &buf)
+		return buf.String()
+	})
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
@@ -41,11 +52,10 @@ func main() {
 	app.Get("/posts", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"message": "Posts"})
 	})
-	app.Get("/posts/:slug", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"message": c.Params("slug")})
-	})
+	app.Get("/posts/:slug", pageHandler.ShowPost)
 
 	app.Get("/api/v1/posts", apiHandler.ListPosts)
+	app.Get("/api/v1/posts/:slug", apiHandler.GetPost)
 	app.Post("/api/v1/posts", apiHandler.CreatePost)
 
 	log.Panic(app.Listen(":8080"))

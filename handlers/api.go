@@ -28,6 +28,30 @@ func (h APIHandler) ListPosts(ctx *fiber.Ctx) error {
 	return nil
 }
 
+// GetPost returns a single post
+func (h APIHandler) GetPost(ctx *fiber.Ctx) error {
+	slug := ctx.Params("slug")
+	post, err := h.posts.GetPostBySlug(slug)
+	if err != nil {
+		return err
+	}
+	type postReponse struct {
+		Title string `json:"title"`
+		Body  string `json:"body"`
+	}
+
+	body, err := post.Render()
+	if err != nil {
+		return err
+	}
+	pr := postReponse{
+		Title: post.Title,
+		Body:  body,
+	}
+	ctx.JSON(pr)
+	return nil
+}
+
 // CreatePost adds a new post to the blog.
 func (h APIHandler) CreatePost(ctx *fiber.Ctx) error {
 	var np models.Post

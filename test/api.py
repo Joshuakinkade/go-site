@@ -6,6 +6,8 @@ def main():
 
     if action == 'list-posts':
         list_posts()
+    elif action == 'get-post':
+        get_post()
     elif action == 'create-post':
         create_post()
     else:
@@ -16,16 +18,20 @@ def list_posts():
     print(r.text)
 
 def create_post():
-    # Define Post
+    # Defin Post
     post = {
-        'title': 'Another Post',
-        'body': 'Here we go again!'
+        'title': 'Fourth Post',
+        'body': '## A Heading\nAnd some body text'
     }
 
     # Send Request
     r = requests.post('http://localhost:8080/api/v1/posts', json=post)
 
     # Check Result
+    print(r.text)
+
+def get_post():
+    r = requests.get('http://localhost:8080/api/v1/posts/fourth-post')
     print(r.text)
 
 if __name__ == '__main__':

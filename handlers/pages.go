@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/joshuakinkade/go-site/models"
 	"github.com/joshuakinkade/go-site/services"
 )
 
@@ -30,14 +29,12 @@ func (h PagesHandler) ShowHome(ctx *fiber.Ctx) error {
 // ShowPost looks for the post with the given slug and renders it
 func (h PagesHandler) ShowPost(ctx *fiber.Ctx) error {
 	slug := ctx.Params("slug")
-	// post, err := h.posts.GetPostBySlug(slug)
-	post := models.Post{
-		Title: "Sample Post",
-		Slug:  slug,
-		Body:  "This is a sample post.",
+	post, err := h.posts.GetPostBySlug(slug)
+	if err != nil {
+		return err
 	}
 
 	return ctx.Render("post", fiber.Map{
 		"Post": post,
-	})
+	}, "layouts/base")
 }
