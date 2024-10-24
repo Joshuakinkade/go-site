@@ -26,6 +26,11 @@ func (h PagesHandler) ShowHome(ctx *fiber.Ctx) error {
 	}, "layouts/base")
 }
 
+func (h PagesHandler) ShowPostList(ctx *fiber.Ctx) error {
+	ctx.SendStatus(fiber.StatusNotImplemented)
+	return nil
+}
+
 // ShowPost looks for the post with the given slug and renders it
 func (h PagesHandler) ShowPost(ctx *fiber.Ctx) error {
 	slug := ctx.Params("slug")

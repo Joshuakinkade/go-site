@@ -9,9 +9,6 @@ import (
 	"github.com/joshuakinkade/go-site/models"
 )
 
-// Depenenencies:
-// posts repository
-
 // PostsService provides methods for working with posts.
 type PostService struct {
 	posts db.IPostsRepository

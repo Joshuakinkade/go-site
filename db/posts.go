@@ -11,9 +11,6 @@ import (
 	"github.com/joshuakinkade/go-site/models"
 )
 
-// Dependencies:
-// db
-
 type IPostsRepository interface {
 	ListPosts(offset, limit int) ([]models.Post, error)
 	GetPostBySlug(slug string) (models.Post, error)
@@ -21,14 +18,17 @@ type IPostsRepository interface {
 	UpdatePost(slug string, updates map[string]interface{}) error
 }
 
+// PostsRepository provides methods for working with posts in the database.
 type PostsRepository struct {
 	db *pgx.Conn
 }
 
+// NewPosts returns an initialized PostsRepository.
 func NewPosts(db *pgx.Conn) PostsRepository {
 	return PostsRepository{db}
 }
 
+// ListPosts retrieves a list of posts in reverse chronological order.
 func (p PostsRepository) ListPosts(offset, limit int) ([]models.Post, error) {
 	sql := "SELECT id, title, slug, body, created_at, updated_at, published_at FROM posts ORDER BY created_at DESC LIMIT $1 OFFSET $2"
 	rows, err := p.db.Query(context.TODO(), sql, limit, offset)
@@ -47,6 +47,7 @@ func (p PostsRepository) ListPosts(offset, limit int) ([]models.Post, error) {
 	return posts, nil
 }
 
+// GetPostbySlugs retrieves a post by its slug.
 func (p PostsRepository) GetPostBySlug(slug string) (models.Post, error) {
 	query := "SELECT id, title, slug, body, created_at, updated_at, published_at FROM posts WHERE slug = $1"
 	row := p.db.QueryRow(context.TODO(), query, slug)
@@ -58,6 +59,7 @@ func (p PostsRepository) GetPostBySlug(slug string) (models.Post, error) {
 	return post, nil
 }
 
+// CreatePost creates a new post.
 func (p PostsRepository) CreatePost(post models.Post) (models.Post, error) {
 	sql := "INSERT INTO posts (id, title, slug, body, created_at, updated_at, published_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id"
 	row := p.db.QueryRow(context.TODO(), sql, post.ID, post.Title, post.Slug, post.Body, post.CreatedAt, post.UpdatedAt, post.PublishedAt)
@@ -68,11 +70,9 @@ func (p PostsRepository) CreatePost(post models.Post) (models.Post, error) {
 	return post, nil
 }
 
+// UpdatePost updates an existing post. It allows updating the body, published_at, title, and updated_at fields.
 func (p PostsRepository) UpdatePost(slug string, updates map[string]interface{}) error {
-	// This nonsense needs to be thoroughly tested to prevent security issues.
-	// Maybe refactor it into a reusable function that can be used in other
-	// repositories and queries.
-	allowedFields := []string{"body", "published_at", "title", "updated_at"} // Needs to be in alphabetical order
+	allowedFields := []string{"body", "published_at", "title", "updated_at"}
 	wheres, args, err := querybuilder.BuildUpdateClause(updates, allowedFields)
 	q := "UPDATE posts SET " + wheres + " WHERE slug = $" + strconv.FormatInt(int64(len(args)+1), 10)
 	args = append(args, slug)

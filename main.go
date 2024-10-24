@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	// Configure the app
+	// Configure templates
 	engine := html.New("./templates", ".html")
 	engine.AddFunc("unescape", func(s string) template.HTML {
 		return template.HTML(s)
@@ -26,6 +26,8 @@ func main() {
 		goldmark.Convert([]byte(s), &buf)
 		return buf.String()
 	})
+
+	// Configure app
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
@@ -49,9 +51,7 @@ func main() {
 
 	// Configure routes
 	app.Get("/", pageHandler.ShowHome)
-	app.Get("/posts", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"message": "Posts"})
-	})
+	app.Get("/posts", pageHandler.ShowPostList)
 	app.Get("/posts/:slug", pageHandler.ShowPost)
 
 	app.Get("/api/v1/posts", apiHandler.ListPosts)
