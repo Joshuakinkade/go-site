@@ -51,7 +51,30 @@ func (p PostService) CreatePost(post models.Post) (models.Post, error) {
 }
 
 // UpdatePost updates an existing post.
-func (p PostService) UpdatePost(post models.Post) (models.Post, error) {
-	post, err := p.posts.UpdatePost(post)
-	return post, err
+func (p PostService) UpdatePost(slug string, updates map[string]interface{}) error {
+	// read input and map to db updates if they exist, making any necessary conversions.
+	var dbUpdates = map[string]interface{}{}
+	var pd *time.Time
+	if published, ok := updates["published"].(bool); ok {
+		if published {
+			now := time.Now()
+			pd = &now
+		} else {
+			pd = nil
+		}
+		dbUpdates["published_at"] = pd
+	}
+
+	if title, ok := updates["title"].(string); ok {
+		dbUpdates["title"] = title
+	}
+
+	if body, ok := updates["body"].(string); ok {
+		dbUpdates["body"] = body
+	}
+
+	dbUpdates["updated_at"] = time.Now()
+
+	err := p.posts.UpdatePost(slug, dbUpdates)
+	return err
 }

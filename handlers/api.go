@@ -72,3 +72,25 @@ func (h APIHandler) CreatePost(ctx *fiber.Ctx) error {
 	ctx.SendStatus(fiber.StatusCreated)
 	return nil
 }
+
+// UpdatePost updates an existing post.
+//
+// Fields:
+// - title: string
+// - body: string
+// - published: bool
+func (h APIHandler) UpdatePost(ctx *fiber.Ctx) error {
+	var body map[string]interface{}
+	err := ctx.BodyParser(&body)
+	if errors.Is(fiber.ErrUnprocessableEntity, err) {
+		ctx.SendStatus(fiber.StatusUnprocessableEntity)
+		return nil
+	}
+
+	// Todo: validate the body here before using it.
+
+	slug := ctx.Params("slug")
+
+	err = h.posts.UpdatePost(slug, body)
+	return err
+}

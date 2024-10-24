@@ -57,6 +57,7 @@ func main() {
 	app.Get("/api/v1/posts", apiHandler.ListPosts)
 	app.Get("/api/v1/posts/:slug", apiHandler.GetPost)
 	app.Post("/api/v1/posts", apiHandler.CreatePost)
+	app.Patch("/api/v1/posts/:slug", apiHandler.UpdatePost)
 
 	log.Panic(app.Listen(":8080"))
 }

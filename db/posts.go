@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strconv"
 
 	"github.com/jackc/pgx/v5"
+	querybuilder "github.com/joshuakinkade/go-site/db/query_builder"
 	"github.com/joshuakinkade/go-site/models"
 )
 
@@ -16,7 +18,7 @@ type IPostsRepository interface {
 	ListPosts(offset, limit int) ([]models.Post, error)
 	GetPostBySlug(slug string) (models.Post, error)
 	CreatePost(post models.Post) (models.Post, error)
-	UpdatePost(post models.Post) (models.Post, error)
+	UpdatePost(slug string, updates map[string]interface{}) error
 }
 
 type PostsRepository struct {
@@ -66,11 +68,16 @@ func (p PostsRepository) CreatePost(post models.Post) (models.Post, error) {
 	return post, nil
 }
 
-func (p PostsRepository) UpdatePost(post models.Post) (models.Post, error) {
-	sql := "UPDATE posts SET title = $1, slug = $2, body = $3, created_at = $4, updated_at = $5, published_at = $6 WHERE id = $7"
-	_, err := p.db.Exec(context.TODO(), sql, post.Title, post.Slug, post.Body, post.CreatedAt, post.UpdatedAt, post.PublishedAt, post.ID)
-	if err != nil {
-		return models.Post{}, err
-	}
-	return models.Post{}, nil
+func (p PostsRepository) UpdatePost(slug string, updates map[string]interface{}) error {
+	// This nonsense needs to be thoroughly tested to prevent security issues.
+	// Maybe refactor it into a reusable function that can be used in other
+	// repositories and queries.
+	allowedFields := []string{"body", "published_at", "title", "updated_at"} // Needs to be in alphabetical order
+	wheres, args, err := querybuilder.BuildUpdateClause(updates, allowedFields)
+	q := "UPDATE posts SET " + wheres + " WHERE slug = $" + strconv.FormatInt(int64(len(args)+1), 10)
+	args = append(args, slug)
+
+	_, err = p.db.Exec(context.TODO(), q, args...)
+
+	return err
 }
