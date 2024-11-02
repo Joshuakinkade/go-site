@@ -1,3 +1,5 @@
+// Package validation provides types for validating data, most likey user input.
+
 package validation
 
 import (
@@ -5,10 +7,13 @@ import (
 	"regexp"
 )
 
+// Validator defines an interface
 type Validator interface {
 	Validate(interface{}) error
 }
 
+// StringValidator validates that the strings match a regex pattern and are
+// within a minimum and maximum length. Any empty requirements will be ignored.
 type StringValidator struct {
 	maxLength int
 	minLength int
@@ -16,25 +21,31 @@ type StringValidator struct {
 	required  bool
 }
 
+// String returns an empty string validator. This will ensure that the value is
+// a string, but nothing more.
 func String() StringValidator {
 	return StringValidator{}
 }
 
+// MaxLength sets the maximum string length for the value.
 func (v StringValidator) MaxLength(maxLength int) StringValidator {
 	v.maxLength = maxLength
 	return v
 }
 
+// MinLength sets the minumum string length for the value.
 func (v StringValidator) MinLength(minLength int) StringValidator {
 	v.minLength = minLength
 	return v
 }
 
+// Regexp sets a regular expression pattern that the string must match
 func (v StringValidator) Regexp(regexp *regexp.Regexp) StringValidator {
 	v.regexp = regexp
 	return v
 }
 
+// Validate checks that the input string fits the criteria
 func (v StringValidator) Validate(input interface{}) error {
 	switch input := input.(type) {
 	case string:
@@ -49,6 +60,42 @@ func (v StringValidator) Validate(input interface{}) error {
 		return fmt.Errorf("value is not a string")
 	}
 
+	return nil
+}
+
+// IntegerValidator checks that an integer field is in bounds
+type IntegerValidator struct {
+	min *int
+	max *int
+}
+
+// Integer returns and empty IntegerValidator
+func Integer() IntegerValidator {
+	return IntegerValidator{}
+}
+
+// Min sets the minumum value of an integer field
+func (v IntegerValidator) Min(min int) IntegerValidator {
+	v.min = &min
+	return v
+}
+
+// Max sets the maximum value of an integer field
+func (v IntegerValidator) Max(max int) IntegerValidator {
+	v.max = &max
+	return v
+}
+
+// Max checks if the integer value is in bounds
+func (v IntegerValidator) Validate(input interface{}) error {
+	switch input := input.(type) {
+	case int:
+		if (v.min != nil && input < *v.min) || (v.max != nil && input > *v.max) {
+			return fmt.Errorf("value must be between %v and %v", v.min, v.max)
+		}
+	default:
+		return fmt.Errorf("value is not an integer")
+	}
 	return nil
 }
 

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"errors"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/joshuakinkade/go-site/services"
 )
@@ -42,4 +44,15 @@ func (h PagesHandler) ShowPost(ctx *fiber.Ctx) error {
 	return ctx.Render("post", fiber.Map{
 		"Post": post,
 	}, "layouts/base")
+}
+
+func (h PagesHandler) ShowError(ctx *fiber.Ctx, err error) error {
+	var e *fiber.Error
+	if errors.As(err, &e) {
+		if e.Code == fiber.StatusNotFound {
+			return ctx.Render("not-found", nil, "layouts/base")
+		}
+		return ctx.Render("internal-error", nil, "layouts/base")
+	}
+	return nil
 }

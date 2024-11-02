@@ -27,13 +27,6 @@ func main() {
 		return buf.String()
 	})
 
-	// Configure app
-	app := fiber.New(fiber.Config{
-		Views: engine,
-	})
-
-	app.Static("/css", "./public/css")
-
 	dbConn, err := pgx.Connect(context.Background(), "postgres://user:secret@postgres:5432/go_site")
 	if err != nil {
 		log.Panic(err)
@@ -48,6 +41,14 @@ func main() {
 	// Initialize handlers
 	pageHandler := handlers.NewPagesHandler(postsService)
 	apiHandler := handlers.NewAPIHandler(postsService)
+
+	// Configure app
+	app := fiber.New(fiber.Config{
+		Views:        engine,
+		ErrorHandler: pageHandler.ShowError,
+	})
+
+	app.Static("/css", "./public/css")
 
 	// Configure routes
 	app.Get("/", pageHandler.ShowHome)

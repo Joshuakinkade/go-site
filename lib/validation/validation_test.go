@@ -44,6 +44,24 @@ var _ = Describe("Validation", func() {
 			Expect(v.Validate("hello")).To(BeNil())
 		})
 	})
+	Describe("IntegerValidator", func() {
+		It("should reject non integer values", func() {
+			v := validation.Integer()
+			Expect(v.Validate("word")).To(MatchError("value is not an integer"))
+		})
+		It("should reject an integer that's too big", func() {
+			v := validation.Integer().Min(0).Max(10)
+			Expect(v.Validate(11)).To(MatchError("value must be between 0 and 10"))
+		})
+		It("should reject an integer that's too small", func() {
+			v := validation.Integer().Min(0).Max(10)
+			Expect(v.Validate(-1)).To(MatchError("value must be between 0 and 10"))
+		})
+		It("should ignore bounds that aren't set", func() {
+			v := validation.Integer().Min(0)
+			Expect(v.Validate(11)).To(BeNil())
+		})
+	})
 	Describe("MapValidator", func() {
 		It("should validate its children", func() {
 			v := validation.Map()

@@ -26,12 +26,22 @@ func NewPhotosRepository(db *pgx.Conn) PhotosRepository {
 }
 
 func (r PhotosRepository) ListPhotos(offset, limit int) ([]models.Photo, error) {
-	query := "SELECT id, alt_text, caption, created_at, uploaded_at FROM photos WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT $1 OFFSET $2"
+	query := "SELECT id, alt_text, caption, uploaded_at FROM photos WHERE deleted_at IS NULL ORDER BY uploaded_at DESC LIMIT $1 OFFSET $2"
 	rows, err := r.db.Query(context.TODO(), query, limit, offset)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
 	defer rows.Close()
+
+	photos := []models.Photo{}
+	for rows.Next() {
+		photo := models.Photo{}
+		err := rows.Scan(&photo.ID, &photo.AltText, &photo.Caption, &photo.UploadedAt)
+		if err != nil {
+			return nil, err
+		}
+		photos = append(photos, photo)
+	}
 
 	return nil, nil
 }
