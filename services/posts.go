@@ -22,9 +22,13 @@ func NewPostService(posts db.IPostsRepository) PostService {
 }
 
 // ListPosts returns a list of posts in reverse chronological order.
-func (p PostService) ListPosts(offset, limit int) ([]models.Post, error) {
+func (p PostService) ListPosts(offset, limit int) ([]models.Post, int, error) {
+	count, err := p.posts.CountPosts()
+	if err != nil {
+		return nil, 0, err
+	}
 	posts, err := p.posts.ListPosts(offset, limit)
-	return posts, err
+	return posts, count, err
 }
 
 // GetPostBySlug returns a post by its slug.

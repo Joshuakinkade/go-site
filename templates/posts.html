@@ -1,0 +1,29 @@
+<header>
+    <h1 class="text-2xl mb-4">Posts</h1>
+</header>
+<main>
+    <ul>
+        {{range .Posts}}
+        <li class="mb-4 pb-2 border-b">
+            <header>
+                <h2 class="text-xl">
+                    <a href="/posts/{{.Slug}}">{{.Title}}</a>
+                </h2>
+            </header>
+            <div>
+                <p>{{StringSlice .Body 0 20 | RenderMarkdown | unescape}}</p>
+                <p><a href="/posts/{{.Slug}}">Read</a></p>
+            </div>
+        </li>
+        {{end}}
+    </ul>
+    <nav>
+        <ul class="flex">
+            {{if .Prev}}
+            <li><a href="{{.Prev}}">Previous</a></li>
+            {{end}} {{if .Next}}
+            <li><a href="{{.Next}}">Next</a></li>
+            {{end}}
+        </ul>
+    </nav>
+</main>

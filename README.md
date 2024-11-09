@@ -1,8 +1,20 @@
 # README
 
 ## Goals
+- build a website that allows me to write blog posts and share photos.
+- experiment go application development and architecture.
+  - handling database stuff: sql queries, migrations, etc.
+  - testing methodologies
+- get some experience with using AI code completion in go, specifically GitHub Copilot.
+
+## Features
+- frontend website with blog posts and photo galleries
+- backend API for managing posts and photos
+- support for markdown in blog posts
+- optimized photo loading
 
 ## Project Design
+
 ### Architecture
 - basically a web MVC with different names.
 - a web layer that handles requests and responses.
@@ -41,7 +53,11 @@
 - [ ] implement image optimization
 - [ ] set up localstack s3 container
 
-### Posts
+### Post List Page
+- [ ] intelligently create snippet: don't cut off markdown tags
+- [ ] paginate post list
+
+### Post Page
 - [ ] render post body
   - [ ] typography
   - [ ] photo gallery markdown tag
@@ -50,6 +66,7 @@
   - metadata: date, tags, reading time, etc.
 
 ## Projects Page
+Save this for later. Work on the blog and photos first.
 - [ ] database model & repository
 - [ ] service
 - [ ] handler
@@ -60,6 +77,9 @@
 - [ ] site footer with contact info
 - [ ] site header with navigation
 - [ ] hot reloading templates in dev mode
+- [ ] standardize JSON reponses for API
+- [ ] write architecture documentation and thought processes behind decisions
+- [ ] move template helpers to a separate file
 
 ## Project Structure
 
@@ -86,6 +106,35 @@ These are the routes for managing site data.
 
 - `POST /api/posts` - create a new post
 - `PUT /api/posts/<slug>` - replace a post
+
+#### Response Format
+The API always responds with valid JSON. If the request was successful, the response will contain the data requested in an object with the type and reponse. The http status will be in the 2xx range. If the request resulted in an error, an error message will be returned in the error field. The API will never return a data field if there's an error. The http status will be in the 4xx or 5xx range.
+
+##### Successful Response
+```json
+{
+  "data": {
+    type: "postList":
+    content: [
+      {
+        "id": 1,
+        "title": "My First Post",
+        "slug": "my-first-post",
+        "date": "2021-09-01",
+        "tags": ["go", "webdev"],
+        "readingTime": 5
+      }
+    ]
+  }
+}
+```
+
+##### Error Response
+```json
+{
+  "error": "Post not found"
+}
+```
 
 ### Images
 

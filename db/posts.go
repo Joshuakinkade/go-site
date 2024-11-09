@@ -13,6 +13,7 @@ import (
 
 type IPostsRepository interface {
 	ListPosts(offset, limit int) ([]models.Post, error)
+	CountPosts() (int, error)
 	GetPostBySlug(slug string) (models.Post, error)
 	CreatePost(post models.Post) (models.Post, error)
 	UpdatePost(slug string, updates map[string]interface{}) error
@@ -45,6 +46,20 @@ func (p PostsRepository) ListPosts(offset, limit int) ([]models.Post, error) {
 		posts = append(posts, post)
 	}
 	return posts, nil
+}
+
+func (p PostsRepository) CountPosts() (int, error) {
+	sql := "SELECT count(*) FROM posts"
+	rows, err := p.db.Query(context.TODO(), sql)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+
+	var count int
+	rows.Next()
+	rows.Scan(&count)
+	return count, nil
 }
 
 // GetPostbySlugs retrieves a post by its slug.

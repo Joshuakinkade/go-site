@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joshuakinkade/go-site/services"
@@ -17,7 +19,7 @@ func NewPagesHandler(posts services.PostService) PagesHandler {
 
 // ShowHome renders the home page
 func (h PagesHandler) ShowHome(ctx *fiber.Ctx) error {
-	posts, err := h.posts.ListPosts(0, 3)
+	posts, _, err := h.posts.ListPosts(0, 3)
 	if err != nil {
 		return err
 	}
@@ -29,7 +31,45 @@ func (h PagesHandler) ShowHome(ctx *fiber.Ctx) error {
 }
 
 func (h PagesHandler) ShowPostList(ctx *fiber.Ctx) error {
-	ctx.SendStatus(fiber.StatusNotImplemented)
+	pageParam := ctx.Query("page")
+	var page int64 = 1
+	if len(pageParam) > 0 {
+		var err error
+		page, err = strconv.ParseInt(pageParam, 10, 64)
+		if err != nil {
+			ctx.WriteString("Invalid page number")
+			ctx.Status(fiber.StatusBadRequest)
+			return nil
+		}
+	}
+
+	pageSize := 2
+	start := (int(page) - 1) * pageSize
+	end := start + pageSize
+
+	posts, totalPosts, err := h.posts.ListPosts(start, end)
+	if err != nil {
+		return err
+	}
+
+	// previous link
+	prevLink := ""
+	if page > 1 {
+		prevLink = fmt.Sprintf("/posts?page=%v", page-1)
+	}
+	// next link, if there are more posts
+	nextLink := ""
+	fmt.Println(end, totalPosts)
+	if end < totalPosts {
+		nextLink = fmt.Sprintf("/posts?page=%v", page+1)
+	}
+
+	ctx.Render("posts", fiber.Map{
+		"Posts": posts,
+		"Next":  nextLink,
+		"Prev":  prevLink,
+	}, "layouts/base")
+
 	return nil
 }
 

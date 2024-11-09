@@ -1,3 +1,8 @@
+#executables
 app
 
+#dependencies
 node_modules
+
+#local dev stuff
+.zed
