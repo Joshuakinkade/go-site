@@ -59,7 +59,6 @@ func (h PagesHandler) ShowPostList(ctx *fiber.Ctx) error {
 	}
 	// next link, if there are more posts
 	nextLink := ""
-	fmt.Println(end, totalPosts)
 	if end < totalPosts {
 		nextLink = fmt.Sprintf("/posts?page=%v", page+1)
 	}
