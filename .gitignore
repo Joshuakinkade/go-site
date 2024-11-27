@@ -6,3 +6,5 @@ node_modules
 
 #local dev stuff
 .zed
+.mypy_cache
+.ropeproject

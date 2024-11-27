@@ -38,8 +38,12 @@ func (m mockRepository) CreatePost(post models.Post) (models.Post, error) {
 	return post, nil
 }
 
-func (m mockRepository) UpdatePost(post models.Post) (models.Post, error) {
-	return post, nil
+func (m mockRepository) UpdatePost(postId string, updates map[string]interface{}) error {
+	return nil
+}
+
+func (m mockRepository) CountPosts() (int, error) {
+	return 0, nil
 }
 
 var _ = Describe("Posts", func() {
@@ -51,20 +55,20 @@ var _ = Describe("Posts", func() {
 	Describe("ListPosts", func() {
 
 		It("should return a list of posts", func() {
-			list, err := posts.ListPosts(0, 10)
+			list, _, err := posts.ListPosts(0, 10)
 			Expect(err).To(BeNil())
 			Expect(list).ToNot(BeEmpty())
 			Expect(len(list)).To(BeNumerically("<", 11))
 		})
 
 		It("should return an empty slice with no error if no posts are available", func() {
-			list, err := posts.ListPosts(10, 10)
+			list, _, err := posts.ListPosts(10, 10)
 			Expect(err).To(BeNil())
 			Expect(list).To(BeEmpty())
 		})
 
 		It("should return an error if the repository fails", func() {
-			list, err := posts.ListPosts(20, 10)
+			list, _, err := posts.ListPosts(20, 10)
 			Expect(err).ToNot(BeNil())
 			Expect(list).To(BeEmpty())
 		})
