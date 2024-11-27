@@ -55,13 +55,13 @@
 
 ### Post List Page
 - [ ] intelligently create snippet: don't cut off markdown tags
-- [ ] paginate post list
+- [x] paginate post list
 
 ### Post Page
 - [ ] render post body
-  - [ ] typography
+  - [x] typography -- just using tailwinds prose plugin for now
   - [ ] photo gallery markdown tag
-- [ ] post header
+- [x] post header -- in other project
   - title
   - metadata: date, tags, reading time, etc.
 
@@ -73,13 +73,14 @@ Save this for later. Work on the blog and photos first.
 - [ ] templage
 
 ### Other
-- [ ] about me page
-- [ ] site footer with contact info
-- [ ] site header with navigation
+- [ ] about me page - other project
+- [x] site footer - other project
+- [ ] site header with navigation - other project
 - [ ] hot reloading templates in dev mode
 - [ ] standardize JSON reponses for API
 - [ ] write architecture documentation and thought processes behind decisions
 - [ ] move template helpers to a separate file
+- [ ] figure out request validation
 
 ## Project Structure
 
@@ -159,3 +160,51 @@ I'll need a custom markdown tag for marking gallery photos
 I want to be able to embed photo galleries into blog posts. I'll add a `data-gallery` and `data-photo-id` attributes to gallery photos so a gallery script can find them and load them into the fviewer.
 
 I might want to consider 3rd party javascript for handling touch events.
+
+## Request Validation
+
+I need a way to easily validate requests. I could use a third party library, I'm trying to avoid that and I think this is a simple enough problem for me to tackle myself. Here are my requirements:
+- simple way of defining validation rules. I'd prefer to avoid parsing a micro-syntax in a string.
+- need to support a variety of data types each with their own validation rules.
+  - strings: min length, max length, regex, reguired vs optional
+  - numbers: min, max, required vs optional
+  - dates: min, max, required vs optional
+- want to avoid doing reflection on go types.
+- ideally, return the validated data in the expected type.
+
+### Questions
+- What can I reuse from my current validation code?
+- Is there a way to make MapValidator return typed fields? Passing in a struct?
+- Would using reflection make this easier?
+  - Use struct tags on input struct to define validation rules?
+
+### Steps to Validate a Field
+1. Check that the field exists in the data.
+2. If it is missing, and the field is required, return an error.
+3. If the field exists, try to convert it to the expected type.
+4. If the conversion fails, return an error.
+5. If the conversion succeeds, check the value against the validation rules.
+6. As soon as one of the rules fails, return an error.
+7. If all of the rules pass, return the type converted value.
+8. If the field does not exist, and is optional, return an empty value of the expected type.
+
+```go
+type StringChecker struct {
+	fieldName string
+	required bool
+	maxLength int
+	minLength int
+	pattern *Regexp
+}
+
+func (c StringChecker) CheckString(data map[string]interface{}) {
+
+}
+```
+
+```go
+type CreatePostInput struct {
+	Title string `json:"title"; checker:"minLength:5,maxLength:10,regexp:"`
+	Body string `json:"body"; checker:""`
+}
+```

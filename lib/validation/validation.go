@@ -101,6 +101,7 @@ func (v IntegerValidator) Validate(input interface{}) error {
 
 type MapValidator struct {
 	validators map[string]Validator
+	required   []string
 }
 
 func Map() MapValidator {
@@ -109,8 +110,11 @@ func Map() MapValidator {
 	}
 }
 
-func (v MapValidator) Add(key string, validator Validator) MapValidator {
+func (v MapValidator) Add(key string, validator Validator, required bool) MapValidator {
 	v.validators[key] = validator
+	if required {
+		v.required = append(v.required, key)
+	}
 	return v
 }
 

@@ -35,6 +35,7 @@ def create_post():
     r = requests.post('http://localhost:8080/api/v1/posts', json=post)
 
     # Check Result
+    print(r.text)
     print(r.status_code)
 
 def update_post():

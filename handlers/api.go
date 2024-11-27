@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
+	"regexp"
 	"sort"
 
 	"github.com/gofiber/fiber/v2"
@@ -11,10 +13,10 @@ import (
 
 type JSONResponse struct {
 	Data struct {
-		Type    string      `json:"type"`
-		Content interface{} `json:"content"`
-	} `json:"data;omitempty"`
-	Error string `json:"error;omitempty"`
+		Type    string      `json:"type,omitempty"`
+		Content interface{} `json:"content,omitempty"`
+	} `json:"data,omitempty"`
+	Error string `json:"error,omitempty"`
 }
 
 func SuccessResponse(contentType string, content interface{}) JSONResponse {
@@ -76,23 +78,80 @@ func (h APIHandler) GetPost(ctx *fiber.Ctx) error {
 	return nil
 }
 
+type StringChecker struct {
+	fieldName string
+	required  bool
+	maxLength int
+	minLength int
+	pattern   *regexp.Regexp
+}
+
+// Check validates that a map has a field and that its value is valid.
+// Can this check multiple data types? map, string, array
+// If string, assume its the value to validate
+// If array, check each value
+// If map, look for value with fieldName
+func (c StringChecker) Check(data map[string]interface{}) (string, error) {
+	if value, ok := data[c.fieldName]; ok {
+		switch value := value.(type) {
+		case string:
+			return value, nil
+		default:
+			return "", fmt.Errorf("%v must be a string", c.fieldName)
+		}
+	} else {
+		if c.required {
+			return "", fmt.Errorf("%v is required", c.fieldName)
+		}
+		return "", nil
+	}
+}
+
 // CreatePost adds a new post to the blog.
 func (h APIHandler) CreatePost(ctx *fiber.Ctx) error {
-	var np models.Post
+	var np map[string]interface{}
 	err := ctx.BodyParser(&np)
 	if errors.Is(fiber.ErrUnprocessableEntity, err) {
 		ctx.SendStatus(fiber.StatusUnprocessableEntity)
 		return nil
 	}
 
-	np, err = h.posts.CreatePost(np)
+	var newPost models.Post
+
+	// I prefer the builder syntax for defining rules
+	titleChecker := StringChecker{
+		fieldName: "title",
+		required:  true,
+	}
+	title, err := titleChecker.Check(np) // I like that this returns a typed value
+	// This is a lot of error handling code for one field, and it's going to be
+	// repeated for each field.
+	if err != nil {
+		ctx.JSON(ErrorResponse(err))
+		ctx.SendStatus(fiber.StatusBadRequest)
+		return nil
+	}
+	newPost.Title = title
+
+	bodyChecker := StringChecker{
+		fieldName: "body",
+		required:  true,
+	}
+	body, err := bodyChecker.Check(np)
+	if err != nil {
+		ctx.JSON(ErrorResponse(err))
+		ctx.SendStatus(fiber.StatusBadRequest)
+	}
+	newPost.Body = body
+
+	newPost, err = h.posts.CreatePost(newPost)
 	if err != nil {
 		ctx.JSON(ErrorResponse(err))
 		ctx.SendStatus(fiber.StatusInternalServerError)
 		return nil
 	}
 
-	ctx.JSON(SuccessResponse("post", np))
+	ctx.JSON(SuccessResponse("post", newPost))
 	ctx.SendStatus(fiber.StatusCreated)
 	return nil
 }
